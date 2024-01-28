@@ -7,7 +7,8 @@ namespace ImageSlayer
     {
         static void Main(string[] args)
         {
-            string serverName = "LAZARUS\\SQLEXPRESS";
+            string serverName = "DORJE;
+            //string serverName = "LAZARUS\\SQLEXPRESS";
             string databaseName = "Putalibazarmun";
             string connectionString = $"Server={serverName};Database={databaseName};Integrated Security=True;";
             string outputPath = @"E:\Sifaris\Putalibazar\Sifaris\MunicipalRecommendation\wwwroot\Files\";
