@@ -48,10 +48,9 @@ namespace ImageSlayer
                             // Create image file
                             File.WriteAllBytes(filePath, imageBytes);
 
-                            //Update ScannedFileName and ScannedFile columns in the database
-                            //string scannedFile = "~/wwwroot/Files/" + newFileName;
+                           
                             string updatedFileName = newFileName;
-                            
+                            reader.Close(); // क्लोस हुनै पर्छ नत्र मुनिको UpdateDatabase मा क्लोस हुनुपर्छ भनेर समस्या आउछ । फेरी एकचोटि क्लोस भैसकेपछि next चोटि read गर्दा समस्या हुन्छ ।
                             UpdateDatabase(connection, scannedDocumentId, updatedFileName);
                           
                         }
@@ -72,10 +71,12 @@ namespace ImageSlayer
 
         static void UpdateDatabase(SqlConnection connection, string scannedDocumentId, string updatedFileName)
         {
+            #region CommentedCode
             //string updateQuery = $"UPDATE ScannedDocument SET ScannedFileName= '{updatedFileName}', ScannedFile= '~/wwwroot/Files/'+ScannedFileName Where  ScannedDocumentId={scannedDocumentId}";
             //SqlCommand updateCommand = new SqlCommand(updateQuery, connection);
             //updateCommand.ExecuteNonQuery();
-               
+            #endregion
+            
             string updateQuery = "UPDATE ScannedDocument SET ScannedFileName = @UpdatedFileName, ScannedFile = '~/wwwroot/Files/' + @UpdatedFileName WHERE ScannedDocumentId = @ScannedDocumentId";
 
             using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
