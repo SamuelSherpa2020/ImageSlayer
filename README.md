@@ -12,5 +12,7 @@ i.     Database which has table called ScannedDocument with the below respective
 
 ii. Have some data in the above table and run this very console application to change those text into images and save those images in the given path with file name mentioned in the code on the otherhand update the  **ScannedFile** and **ScannedFileName** synchronously.
 
+iii. For the Database you could extract the data from the server.
+
 
 		
