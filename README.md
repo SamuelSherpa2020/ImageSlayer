@@ -1,5 +1,5 @@
 # ImageSlayer
-- This is a console application could have included in the main project but it could be heave enough to run slow.
+- This is a console application, it could have included/built in the main project but it could have been heavy enough to run slow and could make sharing over whelming.
 - After the successful mechanism, the code would be added as one of the module of the main project-Sifaris.
   
 ### Requirements before running this project
