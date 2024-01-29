@@ -25,36 +25,52 @@ namespace ImageConverter
                 {
                     conn.Open();
 
-                    string query = "SELECT ScannedDocumentId, ScannedFile, ScannedFileName FROM ScannedDocument";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    while (true)
                     {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        string query = $@"
+                           SELECT 
+                                ROW_NUMBER() As RowNum
+                                ScannedDocumentId, 
+                                ScannedFile, 
+                                ScannedFileName
+                            FROM OrderedResults
+                            WHERE RowNum BETWEEN {batchSize * (pageNumber - 1) + 1} AND {batchSize * pageNumber}";
+
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
                         {
-                            DataTable dt = new DataTable();
-
-                            while (reader.Read())
+                            using (SqlDataReader reader = cmd.ExecuteReader())
                             {
-                                DataRow row = dt.NewRow();
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-                                    row[reader.GetName(i)] = reader[i];
-                                }
-                                dt.Rows.Add(row);
+                                DataTable dt = new DataTable();
 
-                                if (dt.Rows.Count == batchSize)
+                                while (reader.Read())
+                                {
+                                    DataRow row = dt.NewRow();
+                                    for (int i = 0; i < reader.FieldCount; i++)
+                                    {
+                                        row[reader.GetName(i)] = reader[i];
+                                    }
+                                    dt.Rows.Add(row);
+
+                                    if (dt.Rows.Count == batchSize)
+                                    {
+                                        ProcessBatch(dt, outputPath, conn);
+                                        dt.Clear();
+                                    }
+                                }
+
+                                // Process the remaining rows
+                                if (dt.Rows.Count > 0)
                                 {
                                     ProcessBatch(dt, outputPath, conn);
-                                    dt.Clear();
                                 }
                             }
-
-                            // Process the remaining rows
-                            if (dt.Rows.Count > 0)
-                            {
-                                ProcessBatch(dt, outputPath, conn);
-                            }
                         }
+
+                        // Check if there are more batches to process
+                        if (pageNumber * batchSize >= 100) // Replace TotalRowCount with the total number of rows based on your condition
+                            break;
+
+                        pageNumber++;
                     }
                 }
             }

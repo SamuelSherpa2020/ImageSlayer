@@ -1,0 +1,9 @@
+﻿   string serverName = "DORJE";
+            //string serverName = "LAZARUS\\SQLEXPRESS";
+            string databaseName = "Putalibazarmun";
+            string connString = $"Server={serverName};Database={databaseName};Integrated Security=True;";
+            string outputPath = @"C:\Users\someo\OneDrive\PREV FILES\Documents\5-25-2023(Sifaris)";
+            //string outputPath = @"E:\Sifaris\Putalibazar\Sifaris\MunicipalRecommendation\wwwroot\Files\";
+
+            int batchSize = 100; // Set your desired batch size
+            //DataTable dt = new();
