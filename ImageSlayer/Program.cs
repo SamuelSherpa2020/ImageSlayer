@@ -1,92 +1,101 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
-using System.Reflection.PortableExecutable;
-namespace ImageSlayer
+using System.IO;
+
+namespace ImageConverter
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            string serverName = "LAZARUS\\SQLEXPRESS";
+            string serverName = "DORJE";
+            //string serverName = "LAZARUS\\SQLEXPRESS";
             string databaseName = "Putalibazarmun";
-            string connectionString = $"Server={serverName};Database={databaseName};Integrated Security=True;";
-            string outputPath = @"E:\Sifaris\Putalibazar\Sifaris\MunicipalRecommendation\wwwroot\Files\";
+            string connString = $"Server={serverName};Database={databaseName};Integrated Security=True;";
+            string outputPath = @"C:\Users\someo\OneDrive\PREV FILES\Documents\5-25-2023(Sifaris)";
+            //string outputPath = @"E:\Sifaris\Putalibazar\Sifaris\MunicipalRecommendation\wwwroot\Files\";
+
+            int batchSize = 100; // Set your desired batch size
+            //DataTable dt = new();
+
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(connString))
                 {
+                    conn.Open();
 
-                    connection.Open();
-                    string query = "SELECT top(15) ScannedDocumentId, ScannedFile, ScannedFileName FROM ScannedDocument";
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.CommandTimeout = 120;
+                    string query = "SELECT ScannedDocumentId, ScannedFile, ScannedFileName FROM ScannedDocument";
 
-                    SqlDataReader reader = command.ExecuteReader();
-                    if (reader.HasRows)
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        while (reader.Read())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            //connection.Open();
-                            string scannedDocumentId = (string)reader["ScannedDocumentId"];
-                            string base64Data = reader["ScannedFile"].ToString();
-                            string  FileName = reader["ScannedFileName"].ToString();
+                            DataTable dt = new DataTable();
 
-                            //Check if ScannedFileName contains 'wwwroot'
-                            if (base64Data!.Contains("wwwroot"))
+                            while (reader.Read())
                             {
-                                Console.WriteLine($"Skipping row with ScannedDocumentId{scannedDocumentId} as it has already been converted");
-                                continue; // Skip processing this row
+                                DataRow row = dt.NewRow();
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader[i];
+                                }
+                                dt.Rows.Add(row);
+
+                                if (dt.Rows.Count == batchSize)
+                                {
+                                    ProcessBatch(dt, outputPath, conn);
+                                    dt.Clear();
+                                }
                             }
 
-                            // Generate new filename with GUID
-                            string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(FileName);
-                            string filePath = Path.Combine(outputPath, newFileName);
-
-                            //Decode base64 data
-                            byte[] imageBytes = Convert.FromBase64String(base64Data);
-
-                            // Create image file
-                            File.WriteAllBytes(filePath, imageBytes);
-
-                           
-                            string updatedFileName = newFileName;
-                            reader.Close(); // क्लोस हुनै पर्छ नत्र मुनिको UpdateDatabase मा क्लोस हुनुपर्छ भनेर समस्या आउछ । फेरी एकचोटि क्लोस भैसकेपछि next चोटि read गर्दा समस्या हुन्छ ।
-                            UpdateDatabase(connection, scannedDocumentId, updatedFileName);
-                          
+                            // Process the remaining rows
+                            if (dt.Rows.Count > 0)
+                            {
+                                ProcessBatch(dt, outputPath, conn);
+                            }
                         }
                     }
-                    else
-                    {
-                        Console.WriteLine("No rows found in the ScannedDocument table.");
-                    }
-                    reader.Close();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An Error Occured:{ex.Message}");
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
-
         }
 
-        static void UpdateDatabase(SqlConnection connection, string scannedDocumentId, string updatedFileName)
+        static void ProcessBatch(DataTable batch, string outputPath, SqlConnection connection)
         {
-            #region CommentedCode
-            //string updateQuery = $"UPDATE ScannedDocument SET ScannedFileName= '{updatedFileName}', ScannedFile= '~/wwwroot/Files/'+ScannedFileName Where  ScannedDocumentId={scannedDocumentId}";
-            //SqlCommand updateCommand = new SqlCommand(updateQuery, connection);
-            //updateCommand.ExecuteNonQuery();
-            #endregion
-            
-            string updateQuery = "UPDATE ScannedDocument SET ScannedFileName = @UpdatedFileName, ScannedFile = '~/wwwroot/Files/' + @UpdatedFileName WHERE ScannedDocumentId = @ScannedDocumentId";
-
-            using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
+            foreach (DataRow row in batch.Rows)
             {
-                updateCommand.CommandTimeout = 300;
-                updateCommand.Parameters.AddWithValue("@UpdatedFileName", updatedFileName);
-                updateCommand.Parameters.AddWithValue("@ScannedDocumentId", scannedDocumentId);
-                updateCommand.ExecuteNonQuery();
+                string scannedDocId = row["ScannedDocumentId"].ToString();
+                string base64Data = row["ScannedFile"].ToString();
+                string fileName = row["ScannedFileName"].ToString();
+
+                if (base64Data.Contains("wwwroot"))
+                {
+                    // Already converted
+                    continue;
+                }
+
+                // Convert and save image
+                string newFileName = Guid.NewGuid() + Path.GetExtension(fileName);
+                string filePath = Path.Combine(outputPath, newFileName);
+
+                byte[] imageBytes = Convert.FromBase64String(base64Data);
+                File.WriteAllBytes(filePath, imageBytes);
+
+                // Execute update query
+                string updateQuery = "UPDATE ScannedDocument SET ScannedFileName = @NewFileName, ScannedFile = '~/wwwroot/Files/' + @NewFileName WHERE ScannedDocumentId = @DocId";
+
+                using (SqlCommand updateCmd = new SqlCommand(updateQuery, connection))
+                {
+                    updateCmd.Parameters.Add("@NewFileName", SqlDbType.VarChar).Value = newFileName;
+                    updateCmd.Parameters.Add("@DocId", SqlDbType.VarChar).Value = scannedDocId;
+
+                    updateCmd.ExecuteNonQuery();
+                }
             }
-            
         }
     }
 }
