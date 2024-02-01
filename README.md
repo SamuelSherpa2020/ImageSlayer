@@ -1,18 +1,8 @@
-# ImageSlayer
-- This is a console application, it could have included/built in the main project but it could have been heavy enough to run slow and could make sharing over whelming.
-- After the successful mechanism, the code would be added as one of the module of the main project-Sifaris.
-  
-### Requirements before running this project
-i.     Database which has table called ScannedDocument with the below respective field 
-       ScannedDocumentId	nvarchar(50)	- PK
-       ScannedFile	varchar(MAX) - base64 image text
-       RegistrationId	nvarchar(50) - null
-       RegistrationInvoiceId	nvarchar(50)	- FK from RegistrationInvoiceTable	
-       ScannedFileName	varchar(MAX) - name of the file e.g. धरजग्गा.pdf,धरजग्गा.jpeg,धरजग्गा.png, धरजग्गा.htm etc 
-
-ii. Have some data in the above table and run this very console application to change those text into images and save those images in the given path with file name mentioned in the code on the otherhand update the  **ScannedFile** and **ScannedFileName** synchronously.
-
-iii. For the Database you could extract the data from the server.
+# ImageSlayer -Intro
+- This is a C# console application built to convert base64 text saved in a database back into it's original existance which could be image or file.
+- Basically the limited space for a DB in SSMS which was 10GB got filled for one of my active project. So this ImageSlayer was built to convert almost 10 GB of base64 text into image and save it in wwwroot\Files\ leaving DB empty to few MBs.
+- In the project you could see how wisely  ROW_NUMBER() was used to count the total rows, then just convert the base64 texts in the batch of 100 to avoid sql connection timeout or cannot read data in the datatable in the console app.
+- After publish, the exe file was run in the server which gave positive results.
 
 
 		
