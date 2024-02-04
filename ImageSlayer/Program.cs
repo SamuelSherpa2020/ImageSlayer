@@ -12,9 +12,9 @@ namespace ImageConverter
 
             string serverName = "LAZARUS\\SQLEXPRESS";
 
-            string databaseName = "Putalibazarmun";
+            string databaseName = "Walbackup";
             string connString = $"Server={serverName};Database={databaseName};user id=sa;password=Silicon321;Integrated Security=false;";
-            string outputPath = @"E:\Sifaris\Putalibazar\Sifaris\MunicipalRecommendation\wwwroot\FilesDebug\"; //permission check
+            string outputPath = @"E:\Sifaris\Waling-ChalaniKitab\Old-Walingmun-Without-wwwroot\WalingMun Sifaris\MunicipalRecommendation\wwwroot\Files\"; //permission check
 
             int batchSize = 100; // Set your desired batch size
           
@@ -76,10 +76,10 @@ namespace ImageConverter
                     foreach (DataRow row in dt.Rows)
                     {
                         string scannedDocId = row["ScannedDocumentId"].ToString();
-                        string base64Data = row["ScannedFile"].ToString();
+                        string base64Data = row["ScannedFile"] != null ? row["ScannedFile"].ToString():null; // Check for DBNull.Value
                         string fileName = row["ScannedFileName"].ToString();
 
-                        if (base64Data.Contains("wwwroot"))
+                        if (base64Data == "" || base64Data.Contains("wwwroot"))
                         {
                             // Already converted
                             continue;
