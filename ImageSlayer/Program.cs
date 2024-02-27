@@ -13,8 +13,8 @@ namespace ImageConverter
             string serverName = "YourServerName";
 
             string databaseName = "YourDatabaeName";
-            string connString = $"Server={serverName};Database={databaseName};user id=sa;password=Silicon321;Integrated Security=false;";
-            string outputPath = @"C:\inetpub\vhosts\Nagarjun\wwwroot\"; //permission check
+            string connString = $"Server={serverName};Database={databaseName};user id=userId;password=password;Integrated Security=false;";
+            string outputPath = @"C:\path\"; //permission check
 
             int batchSize = 100; // Set your desired batch size
           
