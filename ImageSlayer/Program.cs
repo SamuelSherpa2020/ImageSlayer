@@ -10,9 +10,9 @@ namespace ImageConverter
         static void Main(string[] args)
         {
 
-            string serverName = "WIN-P2AFFTL06E8\\SQLEXPRESS";
+            string serverName = "YourServerName";
 
-            string databaseName = "nagarjunmunNew1";
+            string databaseName = "YourDatabaeName";
             string connString = $"Server={serverName};Database={databaseName};user id=sa;password=Silicon321;Integrated Security=false;";
             string outputPath = @"C:\inetpub\vhosts\Nagarjun\wwwroot\"; //permission check
 
