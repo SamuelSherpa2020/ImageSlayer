@@ -10,11 +10,11 @@ namespace ImageConverter
         static void Main(string[] args)
         {
 
-            string serverName = "LAZARUS\\SQLEXPRESS";
+            string serverName = "WIN-P2AFFTL06E8\\SQLEXPRESS";
 
-            string databaseName = "Walbackup";
+            string databaseName = "nagarjunmunNew1";
             string connString = $"Server={serverName};Database={databaseName};user id=sa;password=Silicon321;Integrated Security=false;";
-            string outputPath = @"E:\Sifaris\Waling-ChalaniKitab\Old-Walingmun-Without-wwwroot\WalingMun Sifaris\MunicipalRecommendation\wwwroot\Files\"; //permission check
+            string outputPath = @"C:\inetpub\vhosts\Nagarjun\wwwroot\"; //permission check
 
             int batchSize = 100; // Set your desired batch size
           
@@ -75,9 +75,9 @@ namespace ImageConverter
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        string scannedDocId = row["ScannedDocumentId"].ToString();
-                        string base64Data = row["ScannedFile"] != null ? row["ScannedFile"].ToString():null; // Check for DBNull.Value
-                        string fileName = row["ScannedFileName"].ToString();
+                        string? scannedDocId = row["ScannedDocumentId"].ToString();
+                        string? base64Data = row["ScannedFile"] != null ? row["ScannedFile"].ToString():null; // Check for DBNull.Value
+                        string? fileName = row["ScannedFileName"].ToString();
 
                         if (base64Data == "" || base64Data.Contains("wwwroot"))
                         {
@@ -124,9 +124,9 @@ namespace ImageConverter
         {
             foreach (DataRow row in batch.Rows)
             {
-                string scannedDocId = row["ScannedDocumentId"].ToString();
-                string base64Data = row["ScannedFile"].ToString();
-                string fileName = row["ScannedFileName"].ToString();
+                string? scannedDocId = row["ScannedDocumentId"].ToString();
+                string? base64Data = row["ScannedFile"].ToString();
+                string? fileName = row["ScannedFileName"].ToString();
 
                 if (base64Data.Contains("wwwroot"))
                 {
