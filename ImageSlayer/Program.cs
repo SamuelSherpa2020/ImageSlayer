@@ -10,11 +10,11 @@ namespace ImageConverter
         static void Main(string[] args)
         {
 
-            string serverName = "YourServerName";
+            string serverName = "DESKTOP-UVOAUPH\\SQLEXPRESS";
 
-            string databaseName = "YourDatabaeName";
-            string connString = $"Server={serverName};Database={databaseName};user id=userId;password=password;Integrated Security=false;";
-            string outputPath = @"C:\path\"; //permission check
+            string databaseName = "BhumeTrial1";
+            string connString = $"Server={serverName};Database={databaseName};user id=sa;password=Silicon321;Integrated Security=false;";
+            string outputPath = @"D:\Sifaris\Bhume- Sahil\E-Sfiaris_Bhume\Sifaris\MunicipalRecommendation\MunicipalRecommendation\wwwroot\Files"; //permission check
 
             int batchSize = 100; // Set your desired batch size
           
